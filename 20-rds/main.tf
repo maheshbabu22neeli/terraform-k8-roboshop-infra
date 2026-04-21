@@ -8,18 +8,18 @@ module "db" {
   instance_class    = "db.t4g.micro"
   allocated_storage = 20
 
-  db_name  = "cities"
-  username = "root"
-  port     = "3306"
+  db_name                     = "cities"
+  username                    = "root"
+  port                        = "3306"
   manage_master_user_password = false
-  password_wo = "RoboShop#1234"
-  password_wo_version = 1
+  password_wo                 = "RoboShop#1234"
+  password_wo_version         = 1
 
   vpc_security_group_ids = [local.mysql_sg_id]
 
   # DB subnet group
   create_db_subnet_group = false
-  db_subnet_group_name = local.database_subnet_group_name
+  db_subnet_group_name   = local.database_subnet_group_name
 
   # DB parameter group
   family = "mysql8.0"
