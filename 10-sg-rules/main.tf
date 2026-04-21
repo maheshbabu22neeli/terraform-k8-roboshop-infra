@@ -34,8 +34,8 @@ resource "aws_security_group_rule" "redis_bastion" {
 // MySQL
 resource "aws_security_group_rule" "mysql_bastion" {
   type      = "ingress"
-  from_port = 22
-  to_port   = 22
+  from_port = 3306
+  to_port   = 3306
   protocol  = "tcp"
   // which means mysql accepting connection from bastion
   security_group_id        = local.mysql_sg_id
