@@ -42,6 +42,16 @@ resource "aws_security_group_rule" "mysql_bastion" {
   source_security_group_id = local.bastion_sg_id
 }
 
+resource "aws_security_group_rule" "mysql_eks_node" {
+  type              = "ingress"
+  from_port         = 3306
+  to_port           = 3306
+  protocol          = "tcp"
+  // which means mysql accepting connection from eks_node
+  security_group_id = local.mysql_sg_id
+  source_security_group_id = local.eks_node_sg_id
+}
+
 // RabbitMq
 resource "aws_security_group_rule" "rabbitmq_bastion" {
   type      = "ingress"
@@ -53,16 +63,7 @@ resource "aws_security_group_rule" "rabbitmq_bastion" {
   source_security_group_id = local.bastion_sg_id
 }
 
-resource "aws_security_group_rule" "mysql_eks_node" {
-  type              = "ingress"
-  from_port         = 3306
-  to_port           = 3306
-  protocol          = "tcp"
-  // which means mysql accepting connection from eks_node
-  security_group_id = local.mysql_sg_id
-  source_security_group_id = local.eks_node_sg_id
-}
-
+// Ingress ALB
 resource "aws_security_group_rule" "ingress_alb_public" {
   type              = "ingress"
   from_port         = 443
@@ -73,6 +74,7 @@ resource "aws_security_group_rule" "ingress_alb_public" {
   cidr_blocks = ["0.0.0.0/0"]
 }
 
+// EKS Control Plane
 resource "aws_security_group_rule" "eks_control_plane_bastion" {
   type              = "ingress"
   from_port         = 443
@@ -80,16 +82,6 @@ resource "aws_security_group_rule" "eks_control_plane_bastion" {
   protocol          = "tcp"
   // which means eks_control_plane accepting connection from bastion
   security_group_id = local.eks_control_plane_sg_id
-  source_security_group_id = local.bastion_sg_id
-}
-
-resource "aws_security_group_rule" "eks_node_bastion" {
-  type              = "ingress"
-  from_port         = 22
-  to_port           = 22
-  protocol          = "tcp"
-  // which means eks_node accepting connection from bastion
-  security_group_id = local.eks_node_sg_id
   source_security_group_id = local.bastion_sg_id
 }
 
@@ -101,6 +93,17 @@ resource "aws_security_group_rule" "eks_control_plane_eks_node" {
   // which means eks_control_plane accepting connection from eks_node
   security_group_id = local.eks_control_plane_sg_id
   source_security_group_id = local.eks_node_sg_id
+}
+
+// EKS Node
+resource "aws_security_group_rule" "eks_node_bastion" {
+  type              = "ingress"
+  from_port         = 22
+  to_port           = 22
+  protocol          = "tcp"
+  // which means eks_node accepting connection from bastion
+  security_group_id = local.eks_node_sg_id
+  source_security_group_id = local.bastion_sg_id
 }
 
 resource "aws_security_group_rule" "eks_node_eks_control_plane" {
