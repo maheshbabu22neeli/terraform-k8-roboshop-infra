@@ -1,0 +1,21 @@
+# Adding service for frontend
+# We are taking LoadBalancer service as this communicate with External Users
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend
+  namespace: roboshop
+  labels:
+    tier: frontend
+    project: roboshop
+    component: frontend
+
+spec:
+  selector:
+    tier: frontend
+    project: roboshop
+    component: frontend
+  ports:
+    - protocol: TCP
+      port: 80         # service port
+      targetPort: 80   # container port

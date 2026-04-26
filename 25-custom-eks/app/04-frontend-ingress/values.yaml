@@ -1,0 +1,8 @@
+deployment:
+  image: maheshbabu22neeli/frontend
+  imageVersion: 1.2.0
+  replicas: 1
+  changeCause: "deploying frontend:1.2.0"
+
+ingress:
+  host: "roboshop-dev.neeli.online"

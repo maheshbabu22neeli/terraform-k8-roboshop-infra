@@ -101,6 +101,7 @@ aws configure
 aws eks update-kubeconfig --name roboshop-dev --region us-east-1
 kubectl get nodes
 ```
+
 Now try to create load database data to MySql service using the below command
 ```shell
 Firstly we require statefulset, headless service, normal service, PV , PVC and Storage Class.
@@ -115,6 +116,10 @@ helm upgrade --install aws-ebs-csi-driver aws-ebs-csi-driver/aws-ebs-csi-driver 
 
 drivers installed
 
+````
+
+### Create Databases
+```shell
 Now, 
 1. Create Namespace
 kubectl apply -f 25-custom-eks/app/00-namespace/namespace.yaml
@@ -126,7 +131,118 @@ kubectl apply -f 25-custom-eks/app/01-storage-class/storage-class.yaml
 3.1 Create Mongo DB
 kubectl apply -f 25-custom-eks/app/02-mongodb/mongodb.yaml
 
+````
 
+### Create Backend
+```shell
 
+4.0 Create Debug
+kubectl apply -f manifest.yaml
 
+4.1 Create Catalogue
+helm upgrade --install catalogue .
+
+4.2 Create User
+helm upgrade --install user .
+
+4.3 Create Cart
+helm upgrade --installc cart .
+
+4.4 Create Shipping
+helm upgrade --install shipping .
+
+4.5 Create Payment
+helm upgrade --install payment .
+
+```
+
+### Create Frontend using Ingress using ServiceAccount
+1. We need OIDC (OpenIDConnect) provider to be enabled in the cluster to use IAM roles for Service Accounts (IRSA) in EKS.
+2. Create IAM role and attach permissions to the role
+3. Create Service Account
+4. Install AWS Load Balancer Controller drivers using Helm and specify the Service Account created in the previous step
+5. Run POD with the Service Account
+6. This allows the Service Account to assume the IAM role and access AWS resources securely without needing to manage long-term credentials.
+
+#### Create OIDC provider
+```shell
+3.91.206.107 | 10.0.1.25 | t3.micro | null
+[ ec2-user@ip-10-0-1-25 ~ ]$ curl -o iam-policy.json https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/v3.2.1/docs/install/iam_policy.json
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100  8955  100  8955    0     0  91377      0 --:--:-- --:--:-- --:--:-- 92319
+```
+
+#### Create IAM Policy
+```shell
+3.91.206.107 | 10.0.1.25 | t3.micro | null
+[ ec2-user@ip-10-0-1-25 ~ ]$ aws iam create-policy \
+    --policy-name AWSLoadBalancerControllerIAMPolicy \
+    --policy-document file://iam-policy.json
+{
+    "Policy": {
+        "PolicyName": "AWSLoadBalancerControllerIAMPolicy",
+        "PolicyId": "ANPAS7GGOGYBGOYINQJTU",
+        "Arn": "arn:aws:iam::<AWS_ACCOUNT>:policy/AWSLoadBalancerControllerIAMPolicy",
+        "Path": "/",
+        "DefaultVersionId": "v1",
+        "AttachmentCount": 0,
+        "PermissionsBoundaryUsageCount": 0,
+        "IsAttachable": true,
+        "CreateDate": "2026-04-26T07:37:09+00:00",
+        "UpdateDate": "2026-04-26T07:37:09+00:00"
+    }
+}
+```
+
+#### Create Service Account
+```shell
+[ ec2-user@ip-10-0-1-25 ~ ]$ eksctl create iamserviceaccount \
+  --cluster=roboshop-dev \
+  --namespace=kube-system \
+  --name=aws-load-balancer-controller \
+  --attach-policy-arn=arn:aws:iam::<AWS_ACCOUNT>:policy/AWSLoadBalancerControllerIAMPolicy \
+  --override-existing-serviceaccounts \
+  --region us-east-1 \
+  --approve
+2026-04-26 07:40:40 [ℹ]  1 iamserviceaccount (kube-system/aws-load-balancer-controller) was included (based on the include/exclude rules)
+2026-04-26 07:40:40 [!]  metadata of serviceaccounts that exist in Kubernetes will be updated, as --override-existing-serviceaccounts was set
+2026-04-26 07:40:40 [ℹ]  1 task: {
+    2 sequential sub-tasks: {
+        create IAM role for serviceaccount "kube-system/aws-load-balancer-controller",
+        create serviceaccount "kube-system/aws-load-balancer-controller",
+    } }2026-04-26 07:40:40 [ℹ]  building iamserviceaccount stack "eksctl-roboshop-dev-addon-iamserviceaccount-kube-system-aws-load-balancer-controller"
+2026-04-26 07:40:40 [ℹ]  deploying stack "eksctl-roboshop-dev-addon-iamserviceaccount-kube-system-aws-load-balancer-controller"
+2026-04-26 07:40:40 [ℹ]  waiting for CloudFormation stack "eksctl-roboshop-dev-addon-iamserviceaccount-kube-system-aws-load-balancer-controller"
+2026-04-26 07:41:10 [ℹ]  waiting for CloudFormation stack "eksctl-roboshop-dev-addon-iamserviceaccount-kube-system-aws-load-balancer-controller"
+2026-04-26 07:41:10 [ℹ]  created serviceaccount "kube-system/aws-load-balancer-controller"
+
+```
+#### Create AWS Load Balancer Controller using Helm
+```shell
+3.91.206.107 | 10.0.1.25 | t3.micro | null
+[ ec2-user@ip-10-0-1-25 ~ ]$ helm repo add eks https://aws.github.io/eks-charts
+"eks" has been added to your repositories
+
+3.91.206.107 | 10.0.1.25 | t3.micro | null
+[ ec2-user@ip-10-0-1-25 ~ ]$ helm repo update
+Hang tight while we grab the latest from your chart repositories...
+...Successfully got an update from the "aws-ebs-csi-driver" chart repository
+...Successfully got an update from the "eks" chart repository
+Update Complete. ⎈Happy Helming!⎈
+
+3.91.206.107 | 10.0.1.25 | t3.micro | null
+[ ec2-user@ip-10-0-1-25 ~ ]$ helm install aws-load-balancer-controller eks/aws-load-balancer-controller \
+  -n kube-system \
+  --set clusterName=roboshop-dev \
+  --set serviceAccount.create=false \
+  --set serviceAccount.name=aws-load-balancer-controller
+NAME: aws-load-balancer-controller
+LAST DEPLOYED: Sun Apr 26 07:46:10 2026
+NAMESPACE: kube-system
+STATUS: deployed
+REVISION: 1
+TEST SUITE: None
+NOTES:
+AWS Load Balancer controller installed!
 ```
