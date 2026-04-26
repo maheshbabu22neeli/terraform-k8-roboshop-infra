@@ -1,6 +1,6 @@
 configMap:
   CART_ENDPOINT: "cart:8080"
-  DB_HOST: "mysql"
+  DB_HOST: "roboshop-dev.c2ncquyas938.us-east-1.rds.amazonaws.com"
 
 deployment:
   image: maheshbabu22neeli/shipping
