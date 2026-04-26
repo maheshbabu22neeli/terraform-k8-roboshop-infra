@@ -1,0 +1,86 @@
+# This manifest will create a statefulset with 3 replicas and a headless service to manage the statefulset
+# We are using volumeClaimTemplates to create PVC for each replica of the statefulset.
+# The PVC will be created with the name <statefulset-name>-<volume-claim-template-name>-<ordinal-index>.
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongodb-headless
+  namespace: roboshop
+  labels:
+    component: mongodb
+    project: roboshop
+    tier: db
+spec:
+  clusterIP: None   # This makes the service headless
+  selector:
+    # labels are used as selectors
+    component: mongodb
+    project: roboshop
+    tier: db
+  ports:
+    - protocol: TCP
+      port: 27017 # servie port
+      targetPort: 27017 # container port
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mongodb
+  namespace: roboshop
+  labels:
+    component: mongodb
+    project: roboshop
+    tier: db
+spec:
+  selector:
+    matchLabels:
+      component: mongodb
+      project: roboshop
+      tier: db
+  serviceName: "mongodb-headless" # we should attach headless service
+  #replicas: 3
+  replicas: 1 # by default is 1
+  # Pod definition
+  template:
+    metadata:
+      labels:
+        component: mongodb
+        project: roboshop
+        tier: db
+    spec:
+      containers:
+        - name: mongodb
+          image: maheshbabu22neeli/mongodb:1.2.0
+          volumeMounts:
+            - name: mongodb
+              mountPath: /data/db
+  # PVC
+  volumeClaimTemplates:
+    - metadata:
+        name: mongodb
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        storageClassName: "roboshop-ebs"     # StorageClass already created in 01-storage-class manifest, which will dynamically provision EBS volumes
+        resources:
+          requests:
+            storage: 1Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongodb
+  namespace: roboshop
+  labels:
+    component: mongodb
+    project: roboshop
+    tier: db
+spec:
+  selector:
+    # labels are used as selectors
+    component: mongodb
+    project: roboshop
+    tier: db
+  ports:
+    - protocol: TCP
+      port: 27017 # servie port
+      targetPort: 27017 # container port
