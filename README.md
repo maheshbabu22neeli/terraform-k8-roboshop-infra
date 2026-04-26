@@ -314,4 +314,23 @@ https://roboshop-dev.neeli.online/
   
   kubectl get pods -n kube-system | grep aws-load-balancer
   
+5. Now configure frontend application using gatway
+3.91.206.107 | 10.0.1.25 | t3.micro | https://github.com/maheshbabu22neeli/terraform-k8-roboshop-infra.git
+[ ec2-user@ip-10-0-1-25 ~/terraform-k8-roboshop-infra/25-custom-eks/app/05-frontend-gateway ]$ kubectl apply -f 01-gateway-class.yaml
+gatewayclass.gateway.networking.k8s.io/roboshop-aws-alb created
+
+3.91.206.107 | 10.0.1.25 | t3.micro | https://github.com/maheshbabu22neeli/terraform-k8-roboshop-infra.git
+[ ec2-user@ip-10-0-1-25 ~/terraform-k8-roboshop-infra/25-custom-eks/app/05-frontend-gateway ]$ kubectl apply -f 02-loadbalancerconfiguration.yaml
+loadbalancerconfiguration.gateway.k8s.aws/roboshop-aws-alb-config created
+
+3.91.206.107 | 10.0.1.25 | t3.micro | https://github.com/maheshbabu22neeli/terraform-k8-roboshop-infra.git
+[ ec2-user@ip-10-0-1-25 ~/terraform-k8-roboshop-infra/25-custom-eks/app/05-frontend-gateway ]$ kubectl apply -f 03-gateway.yaml
+gateway.gateway.networking.k8s.io/roboshop-gateway created
+
+3.91.206.107 | 10.0.1.25 | t3.micro | https://github.com/maheshbabu22neeli/terraform-k8-roboshop-infra.git
+[ ec2-user@ip-10-0-1-25 ~/terraform-k8-roboshop-infra/25-custom-eks/app/05-frontend-gateway ]$ kubectl apply -f 04-frontend.yaml
+targetgroupconfiguration.gateway.k8s.aws/frontend-tgconfig created
+httproute.gateway.networking.k8s.io/frontend-route created
+
 ```
+

@@ -20,7 +20,7 @@ spec:
     - name: roboshop-gateway
       sectionName: https
   hostnames:
-    - "roboshop-dev.daws88s.online"
+    - "roboshop-dev.neeli.online"
   rules:
     - matches:
         - path:
