@@ -1,0 +1,15 @@
+configMap:
+  CART_HOST: "cart"
+  CART_PORT: "8080"
+  USER_HOST: "user"
+  USER_PORT: "8080"
+  AMQP_HOST: "rabbitmq"
+  AMQP_USER: "roboshop"
+  AMQP_PASS: "roboshop123"
+
+deployment:
+  image: maheshbabu22neeli/payment
+  imageVersion: 1.2.0
+  replicas: 1
+  changeCause: "deploying payment:1.2.0"
+

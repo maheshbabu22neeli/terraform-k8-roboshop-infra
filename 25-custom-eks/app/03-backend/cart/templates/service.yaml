@@ -1,0 +1,22 @@
+# Adding service for cart
+# We are taking ClusterIP service as this communicate with internal POD's only
+apiVersion: v1
+kind: Service
+metadata:
+  name: cart
+  namespace: roboshop
+  labels:
+    tier: backend
+    project: roboshop
+    component: cart
+
+spec:
+  selector:
+    # selecting cart pod based on the below labels and add to the service
+    tier: backend
+    project: roboshop
+    component: cart
+  ports:
+    - protocol: TCP
+      port: 8080          # service port
+      targetPort: 8080    # container port

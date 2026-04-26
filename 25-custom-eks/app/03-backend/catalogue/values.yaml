@@ -1,0 +1,9 @@
+configMap:
+  mongoUrl: "mongodb://mongodb:27017/catalogue"
+
+deployment:
+  image: maheshbabu22neeli/catalogue
+  imageVersion: 1.2.0
+  replicas: 1
+  changeCause: "deploying catalogue:1.2.0"
+

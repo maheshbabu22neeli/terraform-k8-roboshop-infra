@@ -1,0 +1,15 @@
+# Config Map
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cart
+  namespace: roboshop
+  labels:
+    tier: backend
+    project: roboshop
+    component: cart
+
+data:
+  CATALOGUE_HOST: {{ .Values.configMap.CATALOGUE_HOST }}
+  CATALOGUE_PORT: "{{ .Values.configMap.CATALOGUE_PORT }}"
+  REDIS_HOST: {{ .Values.configMap.REDIS_HOST }}

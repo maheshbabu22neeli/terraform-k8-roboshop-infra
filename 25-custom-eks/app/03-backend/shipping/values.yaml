@@ -1,0 +1,10 @@
+configMap:
+  CART_ENDPOINT: "cart:8080"
+  DB_HOST: "mysql"
+
+deployment:
+  image: maheshbabu22neeli/shipping
+  imageVersion: 1.2.0
+  replicas: 1
+  changeCause: "deploying shipping:1.2.0"
+

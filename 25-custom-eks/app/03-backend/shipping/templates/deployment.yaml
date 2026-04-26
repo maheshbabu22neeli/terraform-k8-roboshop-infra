@@ -1,0 +1,75 @@
+# Deployment set
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: shipping
+  namespace: roboshop
+  annotations:
+    kubernetes.io/change-cause: {{ .Values.deployment.changeCause }}
+  labels:
+    tier: backend
+    project: roboshop
+    component: shipping
+
+spec:
+  replicas: {{ .Values.deployment.replicas }}
+  selector:
+    # This match labels will go and find the pods who contain these labels
+    matchLabels:
+      tier: backend
+      project: roboshop
+      component: shipping
+
+  # This is a POD definition/template (pod is a subset of replica-set)
+  template:
+    metadata:
+      # POD Labels, these labels will refer in replica-set selector
+      labels:
+        tier: backend
+        project: roboshop
+        component: shipping
+    spec:
+      containers:
+        - name: shipping
+          image: "{{ .Values.deployment.image }}:{{ .Values.deployment.imageVersion }}"
+          imagePullPolicy: Always   # Always pull the image from ECR/GitHub
+
+          resources:
+            # this is minimum resource, soft limit
+            requests:
+              memory: "128Mi"  # RAM
+              cpu: "200m"
+
+            # this is maximum resource, hard limit
+            limits:
+              memory: "256Mi"  # RAM
+              cpu: "250m"
+
+          readinessProbe:
+            tcpSocket:
+              port: 8080
+              #httpGet:
+              #path: /health
+              #port: 8080
+            initialDelaySeconds: 20
+            failureThreshold: 2
+            periodSeconds: 10
+
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            failureThreshold: 2
+            periodSeconds: 10
+
+          startupProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            failureThreshold: 30
+            periodSeconds: 10
+
+          # This container will refer to the above created config map with name 'shipping'
+          envFrom:
+            - configMapRef:
+                name: shipping

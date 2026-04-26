@@ -1,0 +1,14 @@
+# Config Map
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: user
+  namespace: roboshop
+  labels:
+    tier: backend
+    project: roboshop
+    component: user
+
+data:
+  REDIS_URL: {{ .Values.configMap.redisUrl }}
+  MONGO_URL: {{ .Values.configMap.mongoUrl }}

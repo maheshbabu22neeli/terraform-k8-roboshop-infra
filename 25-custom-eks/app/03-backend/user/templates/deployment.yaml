@@ -1,0 +1,69 @@
+# Deployment set
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user
+  namespace: roboshop
+  annotations:
+    kubernetes.io/change-cause: {{ .Values.deployment.changeCause }}
+  labels:
+    tier: backend
+    project: roboshop
+    component: user
+
+spec:
+  replicas: {{ .Values.deployment.replicas }}
+  selector:
+    # This match labels will go and find the pods who contain these labels
+    matchLabels:
+      tier: backend
+      project: roboshop
+      component: user
+
+  # This is a POD definition/template (pod is a subset of replica-set)
+  template:
+    metadata:
+      # POD Labels, these labels will refer in replica-set selector
+      labels:
+        tier: backend
+        project: roboshop
+        component: user
+    spec:
+      containers:
+        - name: user
+          image: "{{ .Values.deployment.image }}:{{ .Values.deployment.imageVersion }}"
+          imagePullPolicy: Always   # Always pull the image from ECR/GitHub
+
+          resources:
+            # this is minimum resource, soft limit
+            requests:
+              memory: "64Mi"  # RAM
+              cpu: "150m"
+
+            # this is maximum resource, hard limit
+            limits:
+              memory: "128Mi"  # RAM
+              cpu: "200m"
+
+          readinessProbe:
+            tcpSocket:
+              port: 8080
+              #httpGet:
+              #path: /health
+              #port: 8080
+            initialDelaySeconds: 5
+            failureThreshold: 2
+            periodSeconds: 10
+
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            failureThreshold: 2
+            periodSeconds: 10
+
+          # This container will refer to the above created config map with name 'user'
+          envFrom:
+            - configMapRef:
+                name: user
+

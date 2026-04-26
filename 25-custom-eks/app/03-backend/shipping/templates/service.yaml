@@ -1,0 +1,22 @@
+# Adding service for shipping
+# We are taking ClusterIP service as this communicate with internal POD's only
+apiVersion: v1
+kind: Service
+metadata:
+  name: shipping
+  namespace: roboshop
+  labels:
+    tier: backend
+    project: roboshop
+    component: shipping
+
+spec:
+  selector:
+    # selecting shipping pod based on the below labels and add to the service
+    tier: backend
+    project: roboshop
+    component: shipping
+  ports:
+    - protocol: TCP
+      port: 8080          # service port
+      targetPort: 8080    # container port

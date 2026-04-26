@@ -1,0 +1,14 @@
+# Config Map
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: shipping
+  namespace: roboshop
+  labels:
+    tier: backend
+    project: roboshop
+    component: shipping
+
+data:
+  CART_ENDPOINT: {{ .Values.configMap.CART_ENDPOINT }}
+  DB_HOST: {{ .Values.configMap.DB_HOST }}

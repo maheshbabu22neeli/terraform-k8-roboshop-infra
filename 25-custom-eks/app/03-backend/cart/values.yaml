@@ -1,0 +1,11 @@
+configMap:
+  CATALOGUE_HOST: "catalogue"
+  CATALOGUE_PORT: "8080"
+  REDIS_HOST: "redis"
+
+deployment:
+  image: maheshbabu22neeli/cart
+  imageVersion: 1.2.0
+  replicas: 1
+  changeCause: "deploying cart:1.2.0"
+

@@ -1,0 +1,13 @@
+# kubernetes Helm Version
+apiVersion: v1
+
+# Name of the chart/mostly app name
+name: cart
+
+# This is the chart version
+version: 0.0.1
+
+# This the image or app version
+appVersion: 1.2.0
+
+description: "cart Helm Chart"
