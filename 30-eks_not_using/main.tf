@@ -2,7 +2,7 @@ module "eks" {
   source  = "terraform-aws-modules/eks/aws"
   version = "~> 21.0"
 
-  name               = "${var.project}-${var.environment}-eks-cluster"
+  name               = "${var.project}-${var.environment}"
   kubernetes_version = "1.34"
 
   addons = {
@@ -57,7 +57,7 @@ module "eks" {
 
   tags = merge(
     {
-      Name = "${var.project}-${var.environment}-eks-cluster"
+      Name = "${var.project}-${var.environment}"
     },
     local.common_tags
   )

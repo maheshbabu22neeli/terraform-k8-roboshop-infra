@@ -30,6 +30,9 @@ module "db" {
   # Database Deletion Protection
   deletion_protection = false
 
+  skip_final_snapshot       = true
+  delete_automated_backups  = true
+
   parameters = [
     {
       name  = "character_set_client"
