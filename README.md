@@ -156,7 +156,7 @@ helm upgrade --install payment .
 
 ```
 
-### Create Frontend using Ingress using ServiceAccount
+### Create Frontend using Ingress and ServiceAccount
 1. We need OIDC (OpenIDConnect) provider to be enabled in the cluster to use IAM roles for Service Accounts (IRSA) in EKS.
 2. Create IAM role and attach permissions to the role
 3. Create Service Account
@@ -245,4 +245,73 @@ REVISION: 1
 TEST SUITE: None
 NOTES:
 AWS Load Balancer controller installed!
+
+```
+
+#### Run Frontend POD
+```shell
+$ helm upgrade --install frontend .
+Release "frontend" does not exist. Installing it now.
+NAME: frontend
+LAST DEPLOYED: Sun Apr 26 08:13:48 2026
+NAMESPACE: default
+STATUS: deployed
+REVISION: 1
+TEST SUITE: None
+``````
+
+#### Create record in route53
+```shell
+Go to loadbalancer and fetch the DNS name and create a record in route53 with the same DNS name
+
+And hit the given url in browser to access the frontend application
+https://roboshop-dev.neeli.online/
+```
+![application_with_ingress.png](images/application_with_ingress.png)
+
+
+### Create AWS Load balancer using Gateway
+1. In the above Ingress control way of creation to ALB is a bit tricky and Engineers has to maintain all the k8 admin tasks. 
+2. In order to overcome the engineer burden and to have clear roles between admin and engineer, they have introduced Gateway controller.
+3. This can be achieved by
+#### Admin Tasks
+- Gateway Class                 -> tells which load balancer to use
+- Load Balancer Configuration   -> Internal/Intenet
+- Gateway Configuration         -> tells about listener
+
+#### Engineer Tasks
+- TargetGroup Configuration
+- HttpRoute
+
+#### Steps to achieve Gateway Controller
+```shell
+1. Delete existing Ingress from the K8
+   Open k9s toll and select roboshop namespace
+   Now, do a get using shift+: and type ingress, it will show ingress details.
+   Click on ctrl+d to delete
+   
+2. Uninstall Drivers
+   helm uninstall aws-load-balancer-controller eks/aws-load-balancer-controller -n kube-system
+   
+3. Install gateway-api new Kind standards
+    kubectl apply --server-side=true -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.5.0/standard-install.yaml
+    
+4. Install AWS Load Balancer Controller
+  VPC_ID=$(aws ssm get-parameter --name /roboshop-dev/vpc_id \
+  --region us-east-1 --query Parameter.Value --output text)
+  
+  helm upgrade --install aws-load-balancer-controller eks/aws-load-balancer-controller \
+  -n kube-system \
+  --set clusterName=roboshop-dev \
+  --set serviceAccount.create=false \
+  --set serviceAccount.name=aws-load-balancer-controller \
+  --set region=us-east-1 \
+  --set vpcId=$VPC_ID \
+  --set controllerConfig.featureGates.ALBGatewayAPI=true \
+  --set controllerConfig.featureGates.NLBGatewayAPI=true
+
+  kubectl rollout status deployment aws-load-balancer-controller -n kube-system
+  
+  kubectl get pods -n kube-system | grep aws-load-balancer
+  
 ```
