@@ -332,5 +332,24 @@ gateway.gateway.networking.k8s.io/roboshop-gateway created
 targetgroupconfiguration.gateway.k8s.aws/frontend-tgconfig created
 httproute.gateway.networking.k8s.io/frontend-route created
 
+Create alias record in Rout53 and access the application using "https://roboshop-dev.neeli.online/"
 ```
+![application_with_gateway.png](images/application_with_gateway.png)
 
+#### Drawbacks from above implementations
+- Why kubernetes is creating all the AWS ALB, Listener, Rules, and TargetGroup
+- These can be created easily by using terraform
+- We can have more control on our side part of work
+
+
+### Create Frontend by AWS terraform 
+1. Create ALB
+2. Create Listener
+3. Create Rule
+4. Create TargetGroup
+5. Then just add TargetGroupBinding to attach pods
+
+Before that we are cleaning all the resources created from above gateway approach
+```shell
+
+```
