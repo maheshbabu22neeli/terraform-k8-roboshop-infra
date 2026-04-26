@@ -60,6 +60,16 @@ drivers installed
 
 Now, 
 1. Create Namespace
-kubectl apply -f 25-custom-eks/00-namespace/namespace.yaml
+kubectl apply -f 25-custom-eks/app/00-namespace/namespace.yaml
+
+2. Create Storage Class
+kubectl apply -f 25-custom-eks/app/01-storage-class/storage-class.yaml
+
+3. Create remaining databases
+3.1 Create Mongo DB
+kubectl apply -f 25-custom-eks/app/02-mongodb/mongodb.yaml
+
+
+
 
 ```
