@@ -33,6 +33,63 @@ terraform plan
 terraform apply -auto-approve
 ```
 
+## 20-rds
+- This module will create the RDS instance for MySql database.
+- We are using the K8 RDS module `source = "terraform-aws-modules/rds/aws"` to create RDS instance.
+- Once MSQL RDS Created, we have to add the data to the database. 
+- To do that we have to connect to the RDS instance using the EC2 bastion server.
+```shell
+Firstly transfer all the data files from Local to Bastion Server
+> scp app-user.sql master-data.sql ec2-user@3.91.206.107:/tmp
+
+Secondly, go to bastion and run the below command to connect to RDS instance and load the data to MySql database
+Install mysql client in bastion server
+sudo dnf install mysql -y
+mysql -h roboshop-dev.c2ncquyas938.us-east-1.rds.amazonaws.com -u root -pRoboShop#1234 < /tmp/app-user.sql
+mysql -h roboshop-dev.c2ncquyas938.us-east-1.rds.amazonaws.com -u root -pRoboShop#1234 < /tmp/master-data.sql
+
+$ mysql -h roboshop-dev.c2ncquyas938.us-east-1.rds.amazonaws.com -u root -pRoboShop#1234
+mysql: [Warning] Using a password on the command line interface can be insecure.
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+Your MySQL connection id is 131
+Server version: 8.0.45 Source distribution
+
+Copyright (c) 2000, 2026, Oracle and/or its affiliates.
+
+Oracle is a registered trademark of Oracle Corporation and/or its
+affiliates. Other names may be trademarks of their respective
+owners.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+mysql> show databases;
++--------------------+
+| Database           |
++--------------------+
+| cities             |
+| information_schema |
+| mysql              |
+| performance_schema |
+| sys                |
++--------------------+
+5 rows in set (0.08 sec)
+
+mysql> use cities;
+Reading table information for completion of table and column names
+You can turn off this feature to get a quicker startup with -A
+
+Database changed
+mysql> show tables;
++------------------+
+| Tables_in_cities |
++------------------+
+| cities           |
+| codes            |
++------------------+
+2 rows in set (0.09 sec)
+
+```
+
 ## 25-custom-eks
 - This module will create the EKS cluster using the "terraform-platform-aws-eks" module.
 - This module contains all the necessary configurations for applications, namespace, databases, frontend, and backend.
