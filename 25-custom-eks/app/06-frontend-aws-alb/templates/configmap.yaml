@@ -1,0 +1,14 @@
+# Config Map
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: frontend
+  namespace: roboshop
+  labels:
+    tier: frontend
+    project: roboshop
+    component: frontend
+
+data:
+  MONGO: "{{ .Values.configMap.MONGO }}"
+  MONGO_URL: {{ .Values.configMap.MONGO_URL }}

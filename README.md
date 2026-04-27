@@ -40,13 +40,13 @@ terraform apply -auto-approve
 - To do that we have to connect to the RDS instance using the EC2 bastion server.
 ```shell
 Firstly transfer all the data files from Local to Bastion Server
-> scp app-user.sql master-data.sql ec2-user@3.91.206.107:/tmp
+> scp app-user.sql master-data.sql ec2-user@13.220.144.75:/tmp
 
 Secondly, go to bastion and run the below command to connect to RDS instance and load the data to MySql database
 Install mysql client in bastion server
 sudo dnf install mysql -y
-mysql -h roboshop-dev.c2ncquyas938.us-east-1.rds.amazonaws.com -u root -pRoboShop#1234 < /tmp/app-user.sql
-mysql -h roboshop-dev.c2ncquyas938.us-east-1.rds.amazonaws.com -u root -pRoboShop#1234 < /tmp/master-data.sql
+mysql -h roboshop-dev.c2ncquyas938.us-east-1.rds.amazonaws.com -u root -pRoboShop#1234 < app-user.sql
+mysql -h roboshop-dev.c2ncquyas938.us-east-1.rds.amazonaws.com -u root -pRoboShop#1234 < master-data.sql
 
 $ mysql -h roboshop-dev.c2ncquyas938.us-east-1.rds.amazonaws.com -u root -pRoboShop#1234
 mysql: [Warning] Using a password on the command line interface can be insecure.
@@ -102,7 +102,7 @@ aws eks update-kubeconfig --name roboshop-dev --region us-east-1
 kubectl get nodes
 ```
 
-Now try to create load database data to MySql service using the below command
+Now try to load database prerequisites data to MySql service using the below command
 ```shell
 Firstly we require statefulset, headless service, normal service, PV , PVC and Storage Class.
 Secondsly, In order to do EBS dynamic provisioning, we need to create Storage Class and PV and PVC.
@@ -129,12 +129,16 @@ kubectl apply -f 25-custom-eks/app/01-storage-class/storage-class.yaml
 
 3. Create remaining databases
 3.1 Create Mongo DB
-kubectl apply -f 25-custom-eks/app/02-mongodb/mongodb.yaml
+kubectl apply -f 25-custom-eks/app/02-databases/mongodb/manifest.yaml
+kubectl apply -f 25-custom-eks/app/02-databases/redis/manifest.yaml
+kubectl apply -f 25-custom-eks/app/02-databases/rabbitmq/manifest.yaml
 
 ````
 
 ### Create Backend
 ```shell
+Go to
+cd 25-custom-eks/app/03-backend
 
 4.0 Create Debug
 kubectl apply -f manifest.yaml
@@ -201,7 +205,7 @@ helm upgrade --install payment .
   --cluster=roboshop-dev \
   --namespace=kube-system \
   --name=aws-load-balancer-controller \
-  --attach-policy-arn=arn:aws:iam::<AWS_ACCOUNT>:policy/AWSLoadBalancerControllerIAMPolicy \
+  --attach-policy-arn=arn:aws:iam::204427113986:policy/AWSLoadBalancerControllerIAMPolicy \
   --override-existing-serviceaccounts \
   --region us-east-1 \
   --approve
@@ -217,6 +221,12 @@ helm upgrade --install payment .
 2026-04-26 07:41:10 [ℹ]  waiting for CloudFormation stack "eksctl-roboshop-dev-addon-iamserviceaccount-kube-system-aws-load-balancer-controller"
 2026-04-26 07:41:10 [ℹ]  created serviceaccount "kube-system/aws-load-balancer-controller"
 
+
+Command to delete any existing ServiceAccount
+eksctl delete iamserviceaccount \
+  --cluster=roboshop-dev \
+  --namespace=kube-system \
+  --name=aws-load-balancer-controller
 ```
 #### Create AWS Load Balancer Controller using Helm
 ```shell
@@ -351,5 +361,73 @@ Create alias record in Rout53 and access the application using "https://roboshop
 
 Before that we are cleaning all the resources created from above gateway approach
 ```shell
+ 1  13/01/26 18:30:51 sudo dnf update -y
+    2  13/01/26 18:30:51 sudo dnf update -y
+    3  13/01/26 18:37:26 sudo init 0
+    4  27/04/26 10:48:12 clear
+    5  27/04/26 10:49:47 aws eks update-kubeconfig --name reoboshop-dev --region us-east-1
+    6  27/04/26 10:49:59 aws configure
+    7  27/04/26 10:50:28 aws eks update-kubeconfig --name reoboshop-dev --region us-east-1
+    8  27/04/26 10:50:42 aws eks update-kubeconfig --name roboshop-dev --region us-east-1
+    9  27/04/26 10:51:44 git clone https://github.com/maheshbabu22neeli/terraform-k8-roboshop-infra.git
+   10  27/04/26 10:51:52 cd terraform-k8-roboshop-infra/
+   11  27/04/26 10:51:58 cd 25-custom-eks/
+   12  27/04/26 10:52:02 cd app
+   13  27/04/26 10:52:05 ls -la
+   14  27/04/26 10:52:09 cd 00-namespace/
+   15  27/04/26 10:52:26 kubectl apply -f namespace.yaml
+   16  27/04/26 10:53:14 helm repo add aws-ebs-csi-driver https://kubernetes-sigs.github.io/aws-ebs-csi-driver
+   17  27/04/26 10:53:20 helm repo update
+   18  27/04/26 10:53:28 helm upgrade --install aws-ebs-csi-driver aws-ebs-csi-driver/aws-ebs-csi-driver --namespace kube-system
+   19  27/04/26 10:54:48 cd ..
+   20  27/04/26 10:55:00 cd 01-storage-class/
+   21  27/04/26 10:55:10 kubectl apply -f ebs-storage-class.yaml
+   22  27/04/26 10:55:19 cd ..
+   23  27/04/26 10:56:19 cd ../..
+   24  27/04/26 10:56:24 kubectl apply -f 25-custom-eks/app/02-databases/mongodb.yaml
+   25  27/04/26 10:57:33 kubectl apply -f 25-custom-eks/app/02-databases/mongodb/manifest.yaml
+   26  27/04/26 10:57:42 kubectl apply -f 25-custom-eks/app/02-databases/redis/manifest.yaml
+   27  27/04/26 10:57:49 kubectl apply -f 25-custom-eks/app/02-databases/rabbitmq/manifest.yaml
+   28  27/04/26 11:00:40 cd 25-custom-eks/app/03-backend
+   29  27/04/26 11:00:47 clear
+   30  27/04/26 11:00:54 cd debug/
+   31  27/04/26 11:01:02 kubectl apply -f manifest.yaml
+   32  27/04/26 11:01:06 cd ..
+   33  27/04/26 11:01:09 cd catalogue/
+   34  27/04/26 11:01:17 helm upgrade --install catalogue .
+   35  27/04/26 11:01:24 cd ../user/
+   36  27/04/26 11:01:33 helm upgrade --install user .
+   37  27/04/26 11:01:38 cd ../cart/
+   38  27/04/26 11:01:46 helm upgrade --installc cart .
+   39  27/04/26 11:01:52 cd ../shipping/
+   40  27/04/26 11:01:58 helm upgrade --install shipping .
+   41  27/04/26 11:02:04 cd ../payment/
+   42  27/04/26 11:02:10 helm upgrade --install payment .
+   43  27/04/26 11:02:15 clear
+   44  27/04/26 11:03:25 cd ../
+   45  27/04/26 11:03:28 cd ..
+   46  27/04/26 11:03:35 ls
+   47  27/04/26 11:03:41 cd 20-rds/
+   48  27/04/26 11:03:43 ls -la
+   49  27/04/26 11:03:53 cd data-files/
+   50  27/04/26 11:03:55 ls -la
+   51  27/04/26 11:05:17 sudo dnf install mysql -y
+   52  27/04/26 11:06:11 ls
+   53  27/04/26 11:06:36 mysql -h roboshop-dev.c2ncquyas938.us-east-1.rds.amazonaws.com -u root -pRoboShop#1234 < app-user.sql
+   54  27/04/26 11:06:47 mysql -h roboshop-dev.c2ncquyas938.us-east-1.rds.amazonaws.com -u root -pRoboShop#1234 < master-data.sql
+   55  27/04/26 11:15:24 cd
+   56  27/04/26 11:15:36  curl -o iam-policy.json https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/v3.2.1/docs/install/iam_policy.json
+   57  27/04/26 11:15:51 aws iam create-policy     --policy-name AWSLoadBalancerControllerIAMPolicy     --policy-document file://iam-policy.json
+   58  27/04/26 11:16:44 eksctl create iamserviceaccount   --cluster=roboshop-dev   --namespace=kube-system   --name=aws-load-balancer-controller   --attach-policy-arn=arn:aws:iam::204427113986:policy/AWSLoadBalancerControllerIAMPolicy   --override-existing-serviceaccounts   --region us-east-1   --approve
+   59  27/04/26 11:17:49 eksctl create iamserviceaccount   --cluster=roboshop-dev   --namespace=kube-system   --name=aws-load-balancer-controller
+   60  27/04/26 11:18:07 eksctl delete iamserviceaccount   --cluster=roboshop-dev   --namespace=kube-system   --name=aws-load-balancer-controller
+   61  27/04/26 11:20:14 eksctl create iamserviceaccount   --cluster=roboshop-dev   --namespace=kube-system   --name=aws-load-balancer-controller   --attach-policy-arn=arn:aws:iam::204427113986:policy/AWSLoadBalancerControllerIAMPolicy   --override-existing-serviceaccounts   --region us-east-1   --approve
+   62  27/04/26 11:27:46 helm repo add eks https://aws.github.io/eks-charts
+   63  27/04/26 11:27:57 helm repo update
+   64  27/04/26 11:28:12 helm install aws-load-balancer-controller eks/aws-load-balancer-controller   -n kube-system   --set clusterName=roboshop-dev   --set serviceAccount.create=false   --set serviceAccount.name=aws-load-balancer-controller
+   65  27/04/26 11:35:01 clear
+   66  27/04/26 11:35:04 history
+
+
 
 ```

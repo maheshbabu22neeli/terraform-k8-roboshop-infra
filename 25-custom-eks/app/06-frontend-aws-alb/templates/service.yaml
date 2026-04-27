@@ -1,0 +1,24 @@
+---
+# Adding service for frontend
+# We are taking LoadBalancer service as this communicate with External Users
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend
+  namespace: roboshop
+  labels:
+    tier: frontend
+    project: roboshop
+    component: frontend
+
+spec:
+  type: LoadBalancer     # Taking LoadBalancer service to expose to external users
+  selector:
+    # selecting mongodb pod based on the below labels and add to the service
+    tier: frontend
+    project: roboshop
+    component: frontend
+  ports:
+    - protocol: TCP
+      port: 80         # service port
+      targetPort: 80   # container port
