@@ -150,7 +150,7 @@ helm upgrade --install catalogue .
 helm upgrade --install user .
 
 4.3 Create Cart
-helm upgrade --installc cart .
+helm upgrade --install cart .
 
 4.4 Create Shipping
 helm upgrade --install shipping .
@@ -360,74 +360,352 @@ Create alias record in Rout53 and access the application using "https://roboshop
 5. Then just add TargetGroupBinding to attach pods
 
 Before that we are cleaning all the resources created from above gateway approach
-```shell
- 1  13/01/26 18:30:51 sudo dnf update -y
-    2  13/01/26 18:30:51 sudo dnf update -y
-    3  13/01/26 18:37:26 sudo init 0
-    4  27/04/26 10:48:12 clear
-    5  27/04/26 10:49:47 aws eks update-kubeconfig --name reoboshop-dev --region us-east-1
-    6  27/04/26 10:49:59 aws configure
-    7  27/04/26 10:50:28 aws eks update-kubeconfig --name reoboshop-dev --region us-east-1
-    8  27/04/26 10:50:42 aws eks update-kubeconfig --name roboshop-dev --region us-east-1
-    9  27/04/26 10:51:44 git clone https://github.com/maheshbabu22neeli/terraform-k8-roboshop-infra.git
-   10  27/04/26 10:51:52 cd terraform-k8-roboshop-infra/
-   11  27/04/26 10:51:58 cd 25-custom-eks/
-   12  27/04/26 10:52:02 cd app
-   13  27/04/26 10:52:05 ls -la
-   14  27/04/26 10:52:09 cd 00-namespace/
-   15  27/04/26 10:52:26 kubectl apply -f namespace.yaml
-   16  27/04/26 10:53:14 helm repo add aws-ebs-csi-driver https://kubernetes-sigs.github.io/aws-ebs-csi-driver
-   17  27/04/26 10:53:20 helm repo update
-   18  27/04/26 10:53:28 helm upgrade --install aws-ebs-csi-driver aws-ebs-csi-driver/aws-ebs-csi-driver --namespace kube-system
-   19  27/04/26 10:54:48 cd ..
-   20  27/04/26 10:55:00 cd 01-storage-class/
-   21  27/04/26 10:55:10 kubectl apply -f ebs-storage-class.yaml
-   22  27/04/26 10:55:19 cd ..
-   23  27/04/26 10:56:19 cd ../..
-   24  27/04/26 10:56:24 kubectl apply -f 25-custom-eks/app/02-databases/mongodb.yaml
-   25  27/04/26 10:57:33 kubectl apply -f 25-custom-eks/app/02-databases/mongodb/manifest.yaml
-   26  27/04/26 10:57:42 kubectl apply -f 25-custom-eks/app/02-databases/redis/manifest.yaml
-   27  27/04/26 10:57:49 kubectl apply -f 25-custom-eks/app/02-databases/rabbitmq/manifest.yaml
-   28  27/04/26 11:00:40 cd 25-custom-eks/app/03-backend
-   29  27/04/26 11:00:47 clear
-   30  27/04/26 11:00:54 cd debug/
-   31  27/04/26 11:01:02 kubectl apply -f manifest.yaml
-   32  27/04/26 11:01:06 cd ..
-   33  27/04/26 11:01:09 cd catalogue/
-   34  27/04/26 11:01:17 helm upgrade --install catalogue .
-   35  27/04/26 11:01:24 cd ../user/
-   36  27/04/26 11:01:33 helm upgrade --install user .
-   37  27/04/26 11:01:38 cd ../cart/
-   38  27/04/26 11:01:46 helm upgrade --installc cart .
-   39  27/04/26 11:01:52 cd ../shipping/
-   40  27/04/26 11:01:58 helm upgrade --install shipping .
-   41  27/04/26 11:02:04 cd ../payment/
-   42  27/04/26 11:02:10 helm upgrade --install payment .
-   43  27/04/26 11:02:15 clear
-   44  27/04/26 11:03:25 cd ../
-   45  27/04/26 11:03:28 cd ..
-   46  27/04/26 11:03:35 ls
-   47  27/04/26 11:03:41 cd 20-rds/
-   48  27/04/26 11:03:43 ls -la
-   49  27/04/26 11:03:53 cd data-files/
-   50  27/04/26 11:03:55 ls -la
-   51  27/04/26 11:05:17 sudo dnf install mysql -y
-   52  27/04/26 11:06:11 ls
-   53  27/04/26 11:06:36 mysql -h roboshop-dev.c2ncquyas938.us-east-1.rds.amazonaws.com -u root -pRoboShop#1234 < app-user.sql
-   54  27/04/26 11:06:47 mysql -h roboshop-dev.c2ncquyas938.us-east-1.rds.amazonaws.com -u root -pRoboShop#1234 < master-data.sql
-   55  27/04/26 11:15:24 cd
-   56  27/04/26 11:15:36  curl -o iam-policy.json https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/v3.2.1/docs/install/iam_policy.json
-   57  27/04/26 11:15:51 aws iam create-policy     --policy-name AWSLoadBalancerControllerIAMPolicy     --policy-document file://iam-policy.json
-   58  27/04/26 11:16:44 eksctl create iamserviceaccount   --cluster=roboshop-dev   --namespace=kube-system   --name=aws-load-balancer-controller   --attach-policy-arn=arn:aws:iam::204427113986:policy/AWSLoadBalancerControllerIAMPolicy   --override-existing-serviceaccounts   --region us-east-1   --approve
-   59  27/04/26 11:17:49 eksctl create iamserviceaccount   --cluster=roboshop-dev   --namespace=kube-system   --name=aws-load-balancer-controller
-   60  27/04/26 11:18:07 eksctl delete iamserviceaccount   --cluster=roboshop-dev   --namespace=kube-system   --name=aws-load-balancer-controller
-   61  27/04/26 11:20:14 eksctl create iamserviceaccount   --cluster=roboshop-dev   --namespace=kube-system   --name=aws-load-balancer-controller   --attach-policy-arn=arn:aws:iam::204427113986:policy/AWSLoadBalancerControllerIAMPolicy   --override-existing-serviceaccounts   --region us-east-1   --approve
-   62  27/04/26 11:27:46 helm repo add eks https://aws.github.io/eks-charts
-   63  27/04/26 11:27:57 helm repo update
-   64  27/04/26 11:28:12 helm install aws-load-balancer-controller eks/aws-load-balancer-controller   -n kube-system   --set clusterName=roboshop-dev   --set serviceAccount.create=false   --set serviceAccount.name=aws-load-balancer-controller
-   65  27/04/26 11:35:01 clear
-   66  27/04/26 11:35:04 history
-
-
-
+# Deploying RoboShop on AWS EKS — A Step-by-Step Story
+> *Date: 27 April 2026 | Environment: AWS EKS (us-east-1) | App: RoboShop*
+----
+🏗️ RoboShop — AWS Infrastructure with Terraform
+> End-to-end AWS infrastructure for the RoboShop e-commerce platform, provisioned using Terraform modules in a numbered, sequential order.
+---
+📁 Repository Structure
 ```
+terraform-k8-roboshop-infra/
+├── 00-vpc/           # VPC, subnets, route tables, IGW, NAT
+├── 05-sg/            # Security Groups (base)
+├── 10-sg-rules/      # Security Group Rules
+├── 15-bastion/       # Bastion Host (EC2)
+├── 20-rds/           # Amazon RDS (MySQL)
+├── 23-acm/           # AWS Certificate Manager (SSL/TLS)
+├── 25-custom-eks/    # EKS Cluster (custom node groups)
+└── 35-frontend-alb/  # Application Load Balancer (Frontend)
+```
+> ⚠️ **Important:** Always apply modules in the numbered order listed above. Each module depends on outputs from the previous one.
+---
+✅ Prerequisites
+Before running any Terraform commands, make sure you have the following set up:
+Terraform `>= 1.0`
+AWS CLI configured with appropriate credentials
+IAM user/role with permissions for VPC, EC2, RDS, EKS, ACM, and ALB
+An S3 backend bucket (if remote state is configured)
+```bash
+aws configure
+```
+---
+🚀 Step-by-Step Deployment
+Step 1 — VPC (`00-vpc`)
+Creates the foundational network layer: VPC, public/private subnets, Internet Gateway, NAT Gateway, and route tables.
+```bash
+cd 00-vpc/
+terraform init
+terraform apply -auto-approve
+```
+Resources created:
+VPC
+Public & Private Subnets (multi-AZ)
+Internet Gateway
+NAT Gateway
+Route Tables & Associations
+---
+Step 2 — Security Groups (`05-sg`)
+Creates all base Security Groups without rules. Rules are managed separately to avoid circular dependencies.
+```bash
+cd ../05-sg/
+terraform init
+terraform apply -auto-approve
+```
+Resources created:
+Security Groups for: ALB, EKS, RDS, Bastion
+---
+Step 3 — Security Group Rules (`10-sg-rules`)
+Attaches inbound and outbound rules to the Security Groups created in Step 2.
+```bash
+cd ../10-sg-rules/
+terraform init
+terraform apply -auto-approve
+```
+Resources created:
+Ingress & Egress rules for all Security Groups
+Cross-SG references (e.g. EKS → RDS, ALB → EKS)
+---
+Step 4 — Bastion Host (`15-bastion`)
+Provisions a Bastion EC2 instance in the public subnet for secure SSH access to private resources.
+```bash
+cd ../15-bastion/
+terraform init
+terraform apply -auto-approve
+```
+Resources created:
+EC2 instance (Bastion Host) in public subnet
+Associated with Bastion Security Group
+---
+Step 5 — RDS MySQL (`20-rds`)
+Provisions an Amazon RDS MySQL instance in the private subnet for relational data storage.
+```bash
+cd ../20-rds/
+terraform init
+terraform apply -auto-approve
+```
+Resources created:
+RDS MySQL instance (private subnet)
+DB Subnet Group
+Parameter Group
+> 💡 Note the RDS endpoint from the output — it is used later when seeding data via the MySQL client.
+---
+Step 6 — ACM SSL Certificate (`23-acm`)
+Requests and validates an SSL/TLS certificate via AWS Certificate Manager for HTTPS on the ALB.
+```bash
+cd ../23-acm/
+terraform init
+terraform apply -auto-approve
+```
+Resources created:
+ACM Certificate (DNS validated)
+Route 53 validation records (if applicable)
+---
+Step 7 — EKS Cluster (`25-custom-eks`)
+Provisions a fully managed EKS cluster with custom node groups in private subnets.
+```bash
+cd ../25-custom-eks/
+terraform init
+terraform apply -auto-approve
+```
+Resources created:
+EKS Control Plane
+Managed Node Groups (private subnets)
+IAM Roles & Policies for EKS
+OIDC Provider (for IRSA)
+> 💡 After apply, update your kubeconfig to start using `kubectl`:
+> ```bash
+> aws eks update-kubeconfig --name roboshop-dev --region us-east-1
+> ```
+---
+Step 8 — Frontend ALB (`35-frontend-alb`)
+Provisions the Application Load Balancer that routes public HTTPS traffic to the RoboShop frontend running on EKS.
+```bash
+cd ../35-frontend-alb/
+terraform init
+terraform apply -auto-approve
+```
+Resources created:
+Application Load Balancer (public subnets)
+HTTPS Listener (uses ACM certificate from Step 6)
+HTTP → HTTPS redirect
+Target Group (forwards to EKS frontend service)
+---
+🗑️ Teardown (Destroy All Resources)
+Destroy resources in reverse order to avoid dependency errors:
+```bash
+cd 35-frontend-alb/ && terraform destroy -auto-approve
+cd ../25-custom-eks/ && terraform destroy -auto-approve
+cd ../23-acm/        && terraform destroy -auto-approve
+cd ../20-rds/        && terraform destroy -auto-approve
+cd ../15-bastion/    && terraform destroy -auto-approve
+cd ../10-sg-rules/   && terraform destroy -auto-approve
+cd ../05-sg/         && terraform destroy -auto-approve
+cd ../00-vpc/        && terraform destroy -auto-approve
+```
+> ⚠️ **RDS Snapshots:** AWS may retain final snapshots after RDS is destroyed. Delete them manually if needed:
+> ```bash
+> aws rds delete-db-snapshot --db-snapshot-identifier <snapshot-id>
+> ```
+---
+🗺️ Architecture Overview
+```
+Internet
+    │
+    ▼
+[ ALB - 35-frontend-alb ]  ← HTTPS (ACM cert from 23-acm)
+    │
+    ▼
+[ EKS Cluster - 25-custom-eks ]  (private subnets)
+    │           │
+    ▼           ▼
+[ RDS MySQL ] [ MongoDB / Redis / RabbitMQ ]
+  20-rds         (deployed via Helm on EKS)
+    │
+[ Bastion Host - 15-bastion ] ← SSH access
+    │
+[ VPC - 00-vpc ]
+[ Security Groups - 05-sg + 10-sg-rules ]
+```
+---
+📋 Module Summary
+Step	Module	Key Resource
+1	`00-vpc`	VPC, Subnets, IGW, NAT
+2	`05-sg`	Security Groups
+3	`10-sg-rules`	SG Ingress/Egress Rules
+4	`15-bastion`	Bastion EC2 Host
+5	`20-rds`	RDS MySQL Instance
+6	`23-acm`	ACM SSL Certificate
+7	`25-custom-eks`	EKS Cluster & Node Groups
+8	`35-frontend-alb`	Application Load Balancer
+---
+Infrastructure for RoboShop on AWS — provisioned with Terraform
+
+
+## Chapter 1: Waking Up the Cluster
+After a long gap since the last system update back in January, it was time to get back to work. The engineer cleared the terminal and set the stage for a full application deployment.
+The mission: deploy the RoboShop e-commerce application onto a custom AWS EKS Kubernetes cluster.
+First, AWS credentials were configured and the kubeconfig was updated to point `kubectl` at the right cluster:
+```bash
+aws configure
+aws eks update-kubeconfig --name roboshop-dev --region us-east-1
+```
+The cluster `roboshop-dev` in `us-east-1` was now accessible.
+---
+## Chapter 2: Getting the Code
+With cluster access confirmed, the infrastructure manifests and Helm charts were pulled down from GitHub:
+```bash
+git clone https://github.com/maheshbabu22neeli/terraform-k8-roboshop-infra.git
+cd terraform-k8-roboshop-infra/25-custom-eks/app
+ls -la
+```
+The repo contained a well-structured directory layout under `25-custom-eks/app/`, with numbered folders guiding the deployment order — from namespaces and storage all the way through to the frontend.
+---
+## Chapter 3: Laying the Foundations — Namespace & Storage
+Every good Kubernetes deployment starts with a namespace to keep workloads organised and isolated.
+```bash
+cd 00-namespace/
+kubectl apply -f namespace.yaml
+```
+Next came storage. RoboShop's databases need persistent volumes, so the AWS EBS CSI Driver was installed to provision EBS volumes dynamically:
+```bash
+helm repo add aws-ebs-csi-driver https://kubernetes-sigs.github.io/aws-ebs-csi-driver
+helm repo update
+helm upgrade --install aws-ebs-csi-driver aws-ebs-csi-driver/aws-ebs-csi-driver --namespace kube-system
+```
+With the driver in place, a custom StorageClass was applied to define how EBS volumes should be provisioned:
+```bash
+cd ../01-storage-class/
+kubectl apply -f ebs-storage-class.yaml
+```
+The cluster now had a solid storage foundation ready for stateful workloads.
+---
+## Chapter 4: Standing Up the Databases
+RoboShop relies on three databases, each serving a distinct role in the application:
+```bash
+kubectl apply -f 25-custom-eks/app/02-databases/mongodb/manifest.yaml
+kubectl apply -f 25-custom-eks/app/02-databases/redis/manifest.yaml
+kubectl apply -f 25-custom-eks/app/02-databases/rabbitmq/manifest.yaml
+```
+Database	Role
+MongoDB	Product catalogue and user data
+Redis	Session caching and cart data
+RabbitMQ	Async messaging between services
+All three were deployed as Kubernetes StatefulSets, backed by the EBS StorageClass configured in the previous step.
+---
+## Chapter 5: Deploying the Backend Microservices
+With the databases running, it was time to bring up the backend services. First, a debug pod was deployed — a handy utility for troubleshooting connectivity inside the cluster:
+```bash
+cd 25-custom-eks/app/03-backend/debug/
+kubectl apply -f manifest.yaml
+```
+Then each microservice was deployed using Helm:
+🗂 Catalogue Service
+```bash
+cd ../catalogue/
+helm upgrade --install catalogue .
+```
+👤 User Service
+```bash
+cd ../user/
+helm upgrade --install user .
+```
+🛒 Cart Service
+```bash
+cd ../cart/
+helm upgrade --install cart .
+```
+📦 Shipping Service
+```bash
+cd ../shipping/
+helm upgrade --install shipping .
+```
+💳 Payment Service
+```bash
+cd ../payment/
+helm upgrade --install payment .
+```
+All five core backend services were now running in the cluster.
+---
+## Chapter 6: Seeding the MySQL Database (RDS)
+RoboShop uses Amazon RDS (MySQL) for relational data — specifically for user accounts and master data like product catalogue and pricing. The MySQL client was installed and the seed scripts were loaded into the RDS instance:
+```bash
+sudo dnf install mysql -y
+
+# Load application user schema
+mysql -h roboshop-dev.c2ncquyas938.us-east-1.rds.amazonaws.com \
+      -u root -pRoboShop#1234 < app-user.sql
+
+# Load master data (products, prices, etc.)
+mysql -h roboshop-dev.c2ncquyas938.us-east-1.rds.amazonaws.com \
+      -u root -pRoboShop#1234 < master-data.sql
+```
+The RDS instance was now fully populated with all the data the backend services needed to function correctly.
+---
+## Chapter 7: Setting Up the AWS Load Balancer Controller
+To expose the application to the internet via an AWS Application Load Balancer (ALB), the AWS Load Balancer Controller was installed. This required an IAM policy and a Kubernetes service account linked to AWS via IRSA (IAM Roles for Service Accounts).
+Step 1 — Download the IAM policy:
+```bash
+curl -o iam-policy.json \
+  https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/v3.2.1/docs/install/iam_policy.json
+```
+Step 2 — Create the IAM policy in AWS:
+```bash
+aws iam create-policy \
+    --policy-name AWSLoadBalancerControllerIAMPolicy \
+    --policy-document file://iam-policy.json
+```
+Step 3 — Create the IRSA service account:
+```bash
+eksctl create iamserviceaccount \
+  --cluster=roboshop-dev \
+  --namespace=kube-system \
+  --name=aws-load-balancer-controller \
+  --attach-policy-arn=arn:aws:iam::204427113986:policy/AWSLoadBalancerControllerIAMPolicy \
+  --override-existing-serviceaccounts \
+  --region us-east-1 \
+  --approve
+```
+Step 4 — Install the controller via Helm:
+```bash
+helm repo add eks https://aws.github.io/eks-charts
+helm repo update
+
+helm install aws-load-balancer-controller eks/aws-load-balancer-controller \
+  -n kube-system \
+  --set clusterName=roboshop-dev \
+  --set serviceAccount.create=false \
+  --set serviceAccount.name=aws-load-balancer-controller
+```
+The AWS Load Balancer Controller was now running, ready to watch for `Ingress` resources and automatically provision ALBs.
+---
+## Chapter 8: Deploying the Frontend
+With all backend services running and the load balancer controller in place, it was time for the final piece — the frontend. The repo was refreshed to pull the latest manifests:
+```bash
+cd terraform-k8-roboshop-infra/
+git pull
+```
+Frontend with ALB Ingress
+```bash
+cd 25-custom-eks/app/06-frontend-aws-alb
+helm upgrade --install frontend .
+```
+Frontend with ALB Target Group Binding
+An additional frontend configuration using Target Group Binding was applied for more fine-grained traffic control:
+```bash
+cd ../07-frontend-aws-alb-tgb/
+kubectl apply -f manifest.yaml
+```
+---
+## Mission Accomplished
+- After a focused and methodical session, the full RoboShop application was live on AWS EKS:
+- Component	Status
+- Kubernetes Namespace	✅ Created
+- EBS CSI Driver	✅ Installed
+- MongoDB / Redis / RabbitMQ	✅ Running
+- Backend Microservices (5)	✅ Deployed via Helm
+- RDS MySQL	✅ Seeded with data
+- AWS Load Balancer Controller	✅ Installed with IRSA
+- Frontend (ALB)	✅ Live
+- The RoboShop e-commerce platform was fully deployed — with an AWS ALB routing public traffic to the frontend, which communicates with the backend microservices, all running securely inside EKS with persistent storage backed by AWS EBS.
+---
