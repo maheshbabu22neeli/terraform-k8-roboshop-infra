@@ -12,7 +12,8 @@ metadata:
     component: frontend
 
 spec:
-  type: LoadBalancer     # Taking LoadBalancer service to expose to external users
+  # LoadBalancer is not required as we have already created alb using aws terraform from 35-frontend-alb
+  #type: LoadBalancer     # Taking LoadBalancer service to expose to external users
   selector:
     # selecting mongodb pod based on the below labels and add to the service
     tier: frontend
