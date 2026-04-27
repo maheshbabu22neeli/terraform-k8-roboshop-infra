@@ -352,7 +352,7 @@ Create alias record in Rout53 and access the application using "https://roboshop
 - We can have more control on our side part of work
 
 
-### Create Frontend by AWS terraform 
+# Create Frontend by AWS terraform 
 1. Create ALB
 2. Create Listener
 3. Create Rule
@@ -492,6 +492,7 @@ HTTP → HTTPS redirect
 Target Group (forwards to EKS frontend service)
 ---
 🗑️ Teardown (Destroy All Resources)
+---
 Destroy resources in reverse order to avoid dependency errors:
 ```bash
 cd 35-frontend-alb/ && terraform destroy -auto-approve
@@ -509,6 +510,7 @@ cd ../00-vpc/        && terraform destroy -auto-approve
 > ```
 ---
 🗺️ Architecture Overview
+---
 ```
 Internet
     │
@@ -529,6 +531,8 @@ Internet
 ```
 ---
 📋 Module Summary
+---
+````
 Step	Module	Key Resource
 1	`00-vpc`	VPC, Subnets, IGW, NAT
 2	`05-sg`	Security Groups
@@ -538,9 +542,11 @@ Step	Module	Key Resource
 6	`23-acm`	ACM SSL Certificate
 7	`25-custom-eks`	EKS Cluster & Node Groups
 8	`35-frontend-alb`	Application Load Balancer
+````
 ---
-Infrastructure for RoboShop on AWS — provisioned with Terraform
 
+Infrastructure for RoboShop on AWS — provisioned with Terraform
+---
 
 ## Chapter 1: Waking Up the Cluster
 After a long gap since the last system update back in January, it was time to get back to work. The engineer cleared the terminal and set the stage for a full application deployment.
