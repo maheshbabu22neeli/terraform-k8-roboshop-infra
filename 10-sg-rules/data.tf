@@ -37,3 +37,19 @@ data "aws_ssm_parameter" "eks_control_plane_sg_id" {
 data "aws_ssm_parameter" "openvpn_sg_id" {
   name = "/${var.project}-${var.environment}/openvpn_sg_id"
 }
+
+data "aws_ssm_parameter" "jenkins_sg_id" {
+  name = "/${var.project}-${var.environment}/jenkins_sg_id"
+}
+
+data "aws_ssm_parameter" "jenkins_agent_sg_id" {
+  name = "/${var.project}-${var.environment}/jenkins_agent_sg_id"
+}
+
+data "aws_ssm_parameter" "sonar_sg_id" {
+  name = "/${var.project}-${var.environment}/sonar_sg_id"
+}
+
+data "aws_ssm_parameter" "github_runner_sg_id" {
+  name = "/${var.project}-${var.environment}/github_runner_sg_id"
+}

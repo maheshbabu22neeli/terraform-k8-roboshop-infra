@@ -149,3 +149,77 @@ resource "aws_security_group_rule" "openvpn_public_943" {
   security_group_id = local.openvpn_sg_id
   cidr_blocks       = ["0.0.0.0/0"]
 }
+
+## As Part of CICD ####
+resource "aws_security_group_rule" "jenkins_public" {
+  type              = "ingress"
+  from_port         = 8080
+  to_port           = 8080
+  protocol          = "tcp" # all traffic
+  # VPC CIDR
+  security_group_id = local.jenkins_sg_id
+  cidr_blocks = ["0.0.0.0/0"]
+}
+
+resource "aws_security_group_rule" "jenkins_ssh" {
+  type              = "ingress"
+  from_port         = 22
+  to_port           = 22
+  protocol          = "tcp" # all traffic
+  # VPC CIDR
+  security_group_id = local.jenkins_sg_id
+  cidr_blocks = ["0.0.0.0/0"]
+}
+
+resource "aws_security_group_rule" "jenkins_agent_ssh" {
+  type              = "ingress"
+  from_port         = 22
+  to_port           = 22
+  protocol          = "tcp" # all traffic
+  # VPC CIDR
+  security_group_id = local.jenkins_agent_sg_id
+  cidr_blocks = ["0.0.0.0/0"]
+}
+
+resource "aws_security_group_rule" "sonar_web" {
+  type              = "ingress"
+  from_port         = 9000
+  to_port           = 9000
+  protocol          = "tcp" # all traffic
+  # VPC CIDR
+  security_group_id = local.sonar_sg_id
+  cidr_blocks = ["0.0.0.0/0"]
+}
+
+resource "aws_security_group_rule" "sonar_ssh" {
+  type              = "ingress"
+  from_port         = 22
+  to_port           = 22
+  protocol          = "tcp" # all traffic
+  # VPC CIDR
+  security_group_id = local.sonar_sg_id
+  cidr_blocks = ["0.0.0.0/0"]
+}
+
+# As part of GitHub CI-CD
+# GitHub Actions and its runners
+resource "aws_security_group_rule" "github_runner_ssh" {
+  type              = "ingress"
+  from_port         = 22
+  to_port           = 22
+  protocol          = "tcp" # all traffic
+  # github_runner accept connections from ssh.
+  security_group_id = local.github_runner_sg_id
+  cidr_blocks = ["0.0.0.0/0"]
+}
+
+# EKS control plane should accept 443 from GitHub runner
+resource "aws_security_group_rule" "eks_control_plane_runner" {
+  type              = "ingress"
+  from_port         = 443
+  to_port           = 443
+  protocol          = "tcp"
+  # Where traffic is coming from GitHub runner
+  security_group_id = local.eks_control_plane_sg_id
+  source_security_group_id = local.github_runner_sg_id
+}
