@@ -1,3 +1,7 @@
+After create the github-runner ec2 instance, do SSH and add below content to etc/systemd/system/runner.service
+
+$ sudo vim /etc/systemd/system/runner.service
+
 [Unit]
 Description=GitHub Actions Runner
 After=network.target
@@ -11,3 +15,39 @@ Restart=always
 
 [Install]
 WantedBy=multi-user.target
+
+
+$ sudo systemctl enable runner --now
+Created symlink /etc/systemd/system/multi-user.target.wants/runner.service → /etc/systemd/system/runner.service.
+
+$ sudo systemctl start runner
+
+$ sudo systemctl status runner
+● runner.service - GitHub Actions Runner
+     Loaded: loaded (/etc/systemd/system/runner.service; enabled; preset: disabled)
+     Active: active (running) since Sun 2026-05-17 04:27:34 UTC; 35s ago
+   Main PID: 8624 (run.sh)
+      Tasks: 16 (limit: 3989)
+     Memory: 39.1M (peak: 40.1M)
+        CPU: 1.221s
+     CGroup: /system.slice/runner.service
+             ├─8624 /bin/bash /home/ec2-user/actions-runner/run.sh
+             ├─8631 /bin/bash /home/ec2-user/actions-runner/run-helper.sh
+             └─8635 /home/ec2-user/actions-runner/bin/Runner.Listener run
+
+May 17 04:27:34 ip-10-0-1-193.ec2.internal snoopy[8624]: [uid:1001 sid:8624 tty:(none) cwd:/home/ec2-user/actions-runner filename:/home/ec2-user/actions-runn>
+May 17 04:27:34 ip-10-0-1-193.ec2.internal snoopy[8626]: [uid:1001 sid:8624 tty:(none) cwd:/home/ec2-user/actions-runner filename:/usr/bin/dirname]: dirname >
+May 17 04:27:34 ip-10-0-1-193.ec2.internal snoopy[8629]: [uid:1001 sid:8624 tty:(none) cwd:/home/ec2-user/actions-runner filename:/usr/bin/cp]: cp -f /home/e>
+May 17 04:27:34 ip-10-0-1-193.ec2.internal snoopy[8631]: [uid:1001 sid:8624 tty:(none) cwd:/home/ec2-user/actions-runner filename:/home/ec2-user/actions-runn>
+May 17 04:27:34 ip-10-0-1-193.ec2.internal snoopy[8632]: [uid:1001 sid:8624 tty:(none) cwd:/home/ec2-user/actions-runner filename:/usr/bin/id]: id -u
+May 17 04:27:34 ip-10-0-1-193.ec2.internal snoopy[8634]: [uid:1001 sid:8624 tty:(none) cwd:/home/ec2-user/actions-runner filename:/usr/bin/dirname]: dirname >
+May 17 04:27:34 ip-10-0-1-193.ec2.internal snoopy[8635]: [uid:1001 sid:8624 tty:(none) cwd:/home/ec2-user/actions-runner filename:/home/ec2-user/actions-runn>
+May 17 04:27:35 ip-10-0-1-193.ec2.internal run.sh[8635]: √ Connected to GitHub
+May 17 04:27:35 ip-10-0-1-193.ec2.internal run.sh[8635]: Current runner version: '2.334.0'
+May 17 04:27:35 ip-10-0-1-193.ec2.internal run.sh[8635]: 2026-05-17 04:27:35Z: Listening for Jobs
+lines 1-22/22 (END)
+
+
+
+
+
